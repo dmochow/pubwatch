@@ -1,0 +1,2 @@
+# Only the blurb drafting step needs this; everything else is standard library.
+anthropic>=1.13,<2

@@ -1,0 +1,56 @@
+# Who to track and how the site should read. Edit this file first.
+#
+# Each person needs at least one OpenAlex author ID under `sources`. To find
+# one, run:   python -m pubwatch find "Jane Doe"
+# and paste the snippet it prints. OpenAlex sometimes splits one person across
+# several records, or merges two people with the same name into one:
+#   - list each record for the same person as another source
+#   - add `require_institution = true` to a merged record to keep only the
+#     works where that author is listed at the institution set below
+#   - list wrongly attributed work IDs under `exclude_works`
+# Adding a person is safe at any time: their existing papers are recorded
+# silently on the next run, and only papers that appear later are announced.
+
+[site]
+title = "Research news"
+organization = "Your Department or Lab"
+organization_url = "https://example.edu/your-department"
+parent = "Your University"
+# The public address of the dashboard, used in the RSS feed. Set it once the
+# Netlify site exists (for example https://pubs.example.edu or the *.netlify.app address).
+url = ""
+description = "New papers from our group, each with a short summary in plain language."
+# Who the blurbs are written for. This goes into the drafting instructions.
+audience = "prospective students and their families, alumni, and the general public"
+maintainer = "Your Name"
+# Accent colour for links and the masthead rule. The dark-mode shade is derived
+# from it unless `accent_dark` is set.
+accent = "#5a2d82"
+# Label on the filter row when more than one person is tracked.
+people_label = "Faculty"
+
+[settings]
+# A paper first seen by the tracker counts as news only if its publication
+# date falls within this many days. Older papers that OpenAlex indexes late
+# are recorded without an alert.
+recent_days = 270
+# OpenAlex institution ID (optional). Needed only for `require_institution`.
+# Find it at https://openalex.org by searching for the institution; the ID
+# starts with "I".
+institution = ""
+
+[alerts]
+# Where the daily email goes.
+to = "you@example.edu"
+subject_prefix = "New publications"
+
+# Replace this example with your own people.
+[[people]]
+name = "Jacek Dmochowski"
+orcid = "0000-0001-6482-5691"
+sources = [{ author = "A5067697868" }]
+
+# [[people]]
+# name = "Jane Doe"
+# sources = [{ author = "A5000000000" }, { author = "A5000000001", require_institution = true }]
+# exclude_works = ["W4000000000"]

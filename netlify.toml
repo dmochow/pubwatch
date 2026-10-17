@@ -1,0 +1,14 @@
+# Netlify builds the dashboard from posts/ and tracker.toml only; no secrets needed.
+# Daily database commits carry "[skip netlify]" so they do not trigger deploys.
+[build]
+  command = "python3 -m pubwatch.site"
+  publish = "site/dist"
+
+[build.environment]
+  PYTHON_VERSION = "3.12"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

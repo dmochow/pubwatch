@@ -1,0 +1,63 @@
+name: Daily publication check
+
+on:
+  schedule:
+    - cron: "15 11 * * *"   # 11:15 UTC; change to suit your time zone
+  workflow_dispatch:         # lets you trigger a run by hand from the Actions tab
+    inputs:
+      queue_since:
+        description: "Optional: also draft papers published on or after this date (YYYY-MM-DD)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pubwatch
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+      - name: Git identity
+        run: |
+          git config user.name "pubwatch"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Queue older papers for drafting
+        if: ${{ github.event.inputs.queue_since != '' && github.event.inputs.queue_since != null }}
+        run: python -m pubwatch queue "${{ github.event.inputs.queue_since }}"
+
+      - name: Fetch, classify, draft, and email
+        run: python -m pubwatch run --open-pr
+
+      - name: Commit updated database dump
+        if: always()
+        run: |
+          git add data/pubwatch.sql
+          if ! git diff --cached --quiet; then
+            git commit -m "Publication check $(date -u +%F) [skip netlify]"
+            git push
+          fi

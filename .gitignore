@@ -1,0 +1,9 @@
+# The binary database is rebuilt from data/pubwatch.sql, which is committed.
+data/*.db
+data/*.sql.tmp
+out/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+site/dist/
