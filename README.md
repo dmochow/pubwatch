@@ -234,4 +234,4 @@ approved blurbs and the one thing worth backing up.
 
 ## License
 
-MIT. Built by [Jacek Dmochowski](jacekd.org) at [The City College of New York](ccny.cuny.edu). Thanks to [Lucas Parra](parralab.org) for helpful advice and beta testing. 
+MIT. Built by [Jacek Dmochowski](http://www.jacekd.org) at [The City College of New York](http://www.ccny.cuny.edu). Thanks to [Lucas Parra](http://www.parralab.org) for helpful advice and beta testing. 
