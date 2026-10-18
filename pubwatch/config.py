@@ -70,6 +70,12 @@ def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
+def placeholder_address(addr: str) -> bool:
+    """True for an empty recipient or one still pointing at an example domain."""
+    addr = (addr or "").strip().lower()
+    return not addr or addr.rsplit("@", 1)[-1] in ("example.com", "example.edu", "example.org", "example.net")
+
+
 def load_dotenv(path: str | Path) -> int:
     """Read KEY=VALUE lines into the environment. Existing variables win. Returns how many were set."""
     path = Path(path)

@@ -93,3 +93,10 @@ class SiteTests(unittest.TestCase):
         page = site.render_index([], "today")
         self.assertIn("<title>Research news</title>", page)
         self.assertNotIn('class="org"', page)
+
+
+class PlaceholderTests(unittest.TestCase):
+    def test_example_domains_and_empty_are_placeholders(self):
+        for addr in ("", "  ", "you@example.edu", "A@EXAMPLE.COM"):
+            self.assertTrue(config.placeholder_address(addr), addr)
+        self.assertFalse(config.placeholder_address("someone@gmail.com"))

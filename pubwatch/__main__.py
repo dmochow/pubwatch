@@ -68,13 +68,16 @@ def cmd_run(args, cfg, conn) -> int:
         print("no alert needed")
         return 0
     msg = notify.build(cfg, items, errors, review_url=review_url)
-    if args.dry_run or not notify.smtp_configured():
+    if config.placeholder_address(cfg.alert_to):
+        errors.append(f"[alerts] to in tracker.toml is still {cfg.alert_to or 'empty'}; email not sent")
+    if args.dry_run or not notify.smtp_configured() or config.placeholder_address(cfg.alert_to):
         out = ROOT / "out"
         out.mkdir(exist_ok=True)
         (out / "alert.eml").write_bytes(bytes(msg))
         html_part = msg.get_body(("html",))
         (out / "alert.html").write_text(html_part.get_content() if html_part else "")
-        reason = "dry run" if args.dry_run else "SMTP_USER/SMTP_PASSWORD not set"
+        reason = ("dry run" if args.dry_run else "recipient not set"
+                  if config.placeholder_address(cfg.alert_to) else "SMTP_USER/SMTP_PASSWORD not set")
         print(f"{reason}: wrote out/alert.eml with {len(items)} item(s); nothing marked as alerted")
     else:
         notify.send(msg)
@@ -95,6 +98,10 @@ def cmd_queue(args, cfg, conn) -> int:
 def cmd_test_email(args, cfg, conn) -> int:
     if not notify.smtp_configured():
         print("SMTP_USER and SMTP_PASSWORD are not set", file=sys.stderr)
+        return 1
+    if config.placeholder_address(cfg.alert_to):
+        print(f"[alerts] to in {args.config} is still {cfg.alert_to or 'empty'}; set your address there first",
+              file=sys.stderr)
         return 1
     notify.send(notify.test_message(cfg))
     print(f"sent a test email to {cfg.alert_to}")
@@ -195,9 +202,11 @@ def cmd_check(args, cfg, conn) -> int:
                 problems += 1
                 print("    require_institution is set but [settings] institution is empty")
     print()
-    print(f"Alerts go to: {cfg.alert_to or '(nobody; set [alerts] to in tracker.toml)'}")
-    if not cfg.alert_to:
+    if config.placeholder_address(cfg.alert_to):
         problems += 1
+        print(f"Alerts go to: {cfg.alert_to or '(nobody)'}  <- set [alerts] to in tracker.toml")
+    else:
+        print(f"Alerts go to: {cfg.alert_to}")
     print(f"Site: {cfg.site.title}" + (f" for {cfg.site.organization_line}" if cfg.site.organization_line else ""))
     print()
     for key, why in (("ANTHROPIC_API_KEY", "drafting blurbs"), ("SMTP_USER", "sending email"),
