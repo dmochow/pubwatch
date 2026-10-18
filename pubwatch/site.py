@@ -273,7 +273,7 @@ def render_index(items: list[dict], built: str, site: Site | None = None) -> str
   <main>{body}</main>
   <footer>
     <p>Paper records sourced from <a href="https://openalex.org">OpenAlex</a>. Summaries drafted with Claude and approved by a person.</p>
-    <p>{maintained}Updated {e(built)}. Built with <a href="https://github.com/dmochow/track-my-pubs">track-my-pubs</a>.</p>
+    <p>{maintained}Updated {e(built)}. Built with <a href="https://github.com/dmochow/pubwatch">pubwatch</a>.</p>
   </footer>
 </div>
 <p id="status" class="sr" aria-live="polite"></p>

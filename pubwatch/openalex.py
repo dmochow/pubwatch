@@ -10,7 +10,7 @@ import urllib.request
 from typing import Iterator
 
 BASE = "https://api.openalex.org"
-USER_AGENT = "track-my-pubs/0.3 (https://github.com/dmochow/track-my-pubs)"
+USER_AGENT = "pubwatch/0.3 (https://github.com/dmochow/pubwatch)"
 FIELDS = ",".join([
     "id", "doi", "title", "publication_date", "publication_year", "type",
     "created_date", "primary_location", "open_access", "authorships",

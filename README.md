@@ -1,4 +1,4 @@
-# track-my-pubs
+# pubwatch
 
 A publication tracker for a lab or department that runs itself. Every
 morning it checks [OpenAlex](https://openalex.org) for new papers by the
@@ -234,4 +234,4 @@ approved blurbs and the one thing worth backing up.
 
 ## License
 
-MIT. Built by Jacek Dmochowski at The City College of New York.
+MIT. Built by [Jacek Dmochowski](jacekd.org) at [The City College of New York](ccny.cuny.edu). Thanks to [Lucas Parra](parralab.org) for helpful advice and beta testing. 

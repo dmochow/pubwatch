@@ -78,7 +78,7 @@ def crossref_abstract(doi: str | None) -> str | None:
     bare = re.sub(r"^https?://(dx\.)?doi\.org/", "", doi)
     url = f"https://api.crossref.org/works/{urllib.parse.quote(bare)}"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "track-my-pubs/0.3"})
+        req = urllib.request.Request(url, headers={"User-Agent": "pubwatch/0.3"})
         with urllib.request.urlopen(req, timeout=30) as resp:
             raw = json.load(resp).get("message", {}).get("abstract")
     except (urllib.error.URLError, TimeoutError, ValueError):
