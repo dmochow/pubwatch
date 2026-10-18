@@ -82,14 +82,25 @@ def _pr_body(rows: list[dict]) -> str:
         "- **To publish,** merge this pull request.",
         "- **To reject everything,** close it without merging.",
         "",
-        "The dashboard preview link from Netlify, once it appears below, shows these drafts in place.",
+        "The full blurbs are in the Files changed tab. The dashboard preview link from Netlify, "
+        "once it appears below, shows them in place.",
         "",
     ]
     for r in rows:
         names = ", ".join(sorted(set((r.get("names") or "").split("|")) - {""}))
         link = r.get("doi") or r.get("landing_url") or ""
-        lines.append(f"- {posts.clean_title(r.get('title'))} ({names}). {r.get('venue') or ''} {link}".rstrip())
-    return "\n".join(lines)
+        title = posts.clean_title(r.get("title"))
+        if r.get("blurb_source") == "none":
+            lines.append(f"### {title}")
+            lines.append("No abstract was found, so no blurb was drafted. Write one in the file, or delete it.")
+        else:
+            lines.append(f"### {r.get('headline') or title}")
+            if r.get("summary"):
+                lines.append(r["summary"])
+        lines.append("")
+        lines.append(f"{title} ({names}). {r.get('venue') or ''} {link}".rstrip())
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def open_pr(conn: sqlite3.Connection, repo: Path, run: Runner = run_cmd,

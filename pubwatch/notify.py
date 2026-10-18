@@ -28,6 +28,23 @@ def pending(conn: sqlite3.Connection) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def in_review(conn: sqlite3.Connection, pr_url: str) -> list[dict]:
+    """Papers whose drafts are in the given review pull request, newest first."""
+    rows = conn.execute(
+        """SELECT w.*, GROUP_CONCAT(f.name, ', ') AS faculty_names,
+                  d.publication_date AS preprint_date
+           FROM works w
+           JOIN authorships a ON a.work_id = w.id
+           JOIN faculty f ON f.slug = a.faculty_slug
+           LEFT JOIN works d ON d.id = w.duplicate_of
+           WHERE w.review_status = 'in_review' AND w.pr_url = ?
+           GROUP BY w.id
+           ORDER BY w.publication_date DESC, w.id""",
+        (pr_url,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def _snippet(text: str | None, limit: int = 420) -> str:
     if not text:
         return ""
@@ -44,7 +61,10 @@ def build(cfg: Config, items: list[dict], errors: list[str] | None = None,
     errors = errors or []
     people = sorted({n.strip() for i in items for n in (i["faculty_names"] or "").split(",")}, key=lambda p: p.split()[-1])
     noun = "paper" if len(items) == 1 else "papers"
-    subject = f"{cfg.subject_prefix}: {len(items)} new {noun}"
+    if any(i.get("status") == "new" for i in items):
+        subject = f"{cfg.subject_prefix}: {len(items)} new {noun}"
+    else:
+        subject = f"{cfg.subject_prefix}: {len(items)} {noun} to review"
     if people:
         subject += " (" + ", ".join(p.split()[-1] for p in people) + ")"
     if not items and errors:

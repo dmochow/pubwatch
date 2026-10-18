@@ -208,3 +208,36 @@ class PostsAndSiteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReviewEmailTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.add_new(work("W30", "Found by date", ["A1"], date="2026-06-01"),
+                     work("W31", "Genuinely new", ["A2"], date="2026-10-02"))
+        self.conn.execute("UPDATE works SET status='baseline' WHERE id='W30'")  # seeded with `queue`
+        self.conn.commit()
+        blurbs.draft_pending(self.conn, self.cfg, drafter=fake_drafter)
+        (self.root / "posts").mkdir()
+
+    def test_pr_body_shows_headline_and_summary(self):
+        git = FakeGit()
+        review.open_pr(self.conn, self.root, run=git, today="2026-10-09")
+        create = next(c for c in git.calls if c[:3] == ["gh", "pr", "create"])
+        body = create[create.index("--body") + 1]
+        self.assertIn("### Plain headline", body)
+        self.assertIn("It did a thing.", body)
+        self.assertIn("Found by date (Ada Alpha). Journal of Tests https://doi.org/10.1/W30", body)
+
+    def test_pull_request_papers_are_emailed_even_without_new_ones(self):
+        url = review.open_pr(self.conn, self.root, run=FakeGit(), today="2026-10-09")
+        pending = notify.pending(self.conn)
+        self.assertEqual([i["id"] for i in pending], ["W31"])  # only the new one
+        reviewed = notify.in_review(self.conn, url)
+        self.assertEqual(sorted(i["id"] for i in reviewed), ["W30", "W31"])
+        self.assertEqual(notify.in_review(self.conn, "https://example/other"), [])
+        subject = notify.build(self.cfg, reviewed, review_url=url)["Subject"]
+        self.assertTrue(subject.startswith("Test: 2 new papers"), subject)
+        only_seeded = [i for i in reviewed if i["id"] == "W30"]
+        subject = notify.build(self.cfg, only_seeded, review_url=url)["Subject"]
+        self.assertTrue(subject.startswith("Test: 1 paper to review"), subject)

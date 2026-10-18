@@ -64,6 +64,9 @@ def cmd_run(args, cfg, conn) -> int:
         print(f"error: {e}", file=sys.stderr)
 
     items = notify.pending(conn)
+    if review_url:
+        seen = {i["id"] for i in items}
+        items += [i for i in notify.in_review(conn, review_url) if i["id"] not in seen]
     if not items and not errors:
         print("no alert needed")
         return 0
