@@ -34,11 +34,22 @@ cd YOUR-REPO
 pip install -r requirements.txt
 ```
 
-### 2. List the people to track
+### 2. Fill in `tracker.toml`
 
-Open `tracker.toml`. Fill in the `[site]` section with your department or
-lab name, and the `[alerts]` section with the email address that should
-receive the digest.
+Everything the tracker needs to know about you is in one file,
+`tracker.toml`. Open it and change three things:
+
+- **`[site]`**: the name of your department or lab, its web address, and
+  the one-line description for the dashboard. The `maintainer` name goes in
+  the page footer.
+- **`[alerts]`**: `to` is the address that receives the daily digest. The
+  tracker refuses to send mail while this is still the example address.
+- **`[[people]]`**: one block per person to track, which the next step
+  fills in.
+
+The comments in the file explain every setting.
+
+### 3. List the people to track
 
 Each person needs an OpenAlex author ID. Look one up by name:
 
@@ -56,25 +67,29 @@ orcid = "0000-0002-1825-0097"
 sources = [{ author = "A5012345678" }]
 ```
 
-OpenAlex sometimes splits one person across several records, or merges two
-people with the same name into one. The comments in `tracker.toml` explain
-the two fixes: list several `sources` for one person, or add
-`require_institution = true` to a merged record so that only papers with
-your institution's affiliation count.
+Paste one block per person into `tracker.toml`, replacing the example
+entry. OpenAlex sometimes splits one person across several records, or
+merges two people with the same name into one. The comments in
+`tracker.toml` explain the two fixes: list several `sources` for one
+person, or add `require_institution = true` to a merged record so that
+only papers with your institution's affiliation count.
 
-Then confirm every ID resolves to the person you expect:
+Then confirm the file loads, every ID resolves to the person you expect,
+and the digest address is set:
 
 ```
 python -m pubwatch check
 ```
 
-### 3. Add your keys
+### 4. Add your keys
 
 ```
 cp .env.example .env
 ```
 
-Fill in `ANTHROPIC_API_KEY`, `SMTP_USER` and `SMTP_PASSWORD`. For Gmail,
+Open the new `.env` (not `.env.example`, which stays as the blank
+template) and fill in `ANTHROPIC_API_KEY`, `SMTP_USER` and
+`SMTP_PASSWORD`. For Gmail,
 `SMTP_USER` is your address and `SMTP_PASSWORD` is an
 [app password](https://myaccount.google.com/apppasswords), which requires
 two-step verification on the account. Other mail providers work by also
@@ -92,7 +107,7 @@ The dry run records everyone's back catalog without announcing anything,
 and writes the email it would have sent to `out/alert.html`. From now on,
 only papers that appear after this point count as news.
 
-### 4. Put the same keys on GitHub
+### 5. Put the same keys on GitHub
 
 The daily job needs the keys as repository secrets. With the
 [GitHub CLI](https://cli.github.com) installed and logged in, this loads
@@ -117,7 +132,7 @@ git commit -m "Set up tracking"
 git push
 ```
 
-### 5. Run it once by hand
+### 6. Run it once by hand
 
 On GitHub, open the **Actions** tab, pick **Daily publication check**, and
 click **Run workflow**. Leave the date box empty for a normal run, or type
@@ -130,7 +145,7 @@ named "Review: N new papers". From then on the job runs every morning on
 its own at 11:15 UTC. Change the `cron` line in
 `.github/workflows/daily.yml` to move it.
 
-### 6. Publish the dashboard on Netlify
+### 7. Publish the dashboard on Netlify
 
 1. Sign in to Netlify and choose **Add new site → Import an existing
    project → GitHub**. Pick your repository.
