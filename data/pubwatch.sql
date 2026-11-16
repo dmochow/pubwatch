@@ -195,6 +195,7 @@ INSERT INTO "runs" VALUES(25,'2026-11-12T18:52:35+00:00','2026-11-12T18:52:36+00
 INSERT INTO "runs" VALUES(26,'2026-11-13T18:29:50+00:00','2026-11-13T18:29:51+00:00',137,0,0,NULL);
 INSERT INTO "runs" VALUES(27,'2026-11-14T17:01:44+00:00','2026-11-14T17:01:46+00:00',137,0,0,NULL);
 INSERT INTO "runs" VALUES(28,'2026-11-15T17:41:19+00:00','2026-11-15T17:41:20+00:00',137,0,0,NULL);
+INSERT INTO "runs" VALUES(29,'2026-11-16T20:58:32+00:00','2026-11-16T20:58:33+00:00',137,0,0,NULL);
 CREATE TABLE works (
     id               TEXT PRIMARY KEY,
     doi              TEXT,
@@ -373,5 +374,5 @@ CREATE INDEX works_title_key ON works(title_key);
 CREATE INDEX works_status ON works(status, alerted_at);
 CREATE INDEX works_review ON works(review_status);
 DELETE FROM "sqlite_sequence";
-INSERT INTO "sqlite_sequence" VALUES('runs',28);
+INSERT INTO "sqlite_sequence" VALUES('runs',29);
 COMMIT;
