@@ -205,6 +205,7 @@ INSERT INTO "runs" VALUES(35,'2026-11-22T18:28:35+00:00','2026-11-22T18:28:36+00
 INSERT INTO "runs" VALUES(36,'2026-11-23T22:36:27+00:00','2026-11-23T22:36:57+00:00',0,0,0,'Jacek Dmochowski: HTTP 429 for https://api.openalex.org/works?filter=author.id%3AA5067697868&per-page=200&select=id%2Cdoi%2Ctitle%2Cpublication_date%2Cpublication_year%2Ctype%2Ccreated_date%2Cprimary_location%2Copen_access%2Cauthorships%2Cabstract_inverted_index%2Cids%2Cis_retracted&cursor=%2A');
 INSERT INTO "runs" VALUES(37,'2026-11-24T21:08:36+00:00','2026-11-24T21:08:37+00:00',136,0,0,NULL);
 INSERT INTO "runs" VALUES(38,'2026-11-25T20:27:13+00:00','2026-11-25T20:27:13+00:00',136,0,0,NULL);
+INSERT INTO "runs" VALUES(39,'2026-11-26T20:08:28+00:00','2026-11-26T20:08:29+00:00',136,0,0,NULL);
 CREATE TABLE works (
     id               TEXT PRIMARY KEY,
     doi              TEXT,
@@ -383,5 +384,5 @@ CREATE INDEX works_title_key ON works(title_key);
 CREATE INDEX works_status ON works(status, alerted_at);
 CREATE INDEX works_review ON works(review_status);
 DELETE FROM "sqlite_sequence";
-INSERT INTO "sqlite_sequence" VALUES('runs',38);
+INSERT INTO "sqlite_sequence" VALUES('runs',39);
 COMMIT;
